@@ -1,0 +1,260 @@
+import java.util.*;
+
+public class Main {
+
+    // Reverse descending run
+    static void reverse(int[] arr,
+                        int start,
+                        int end) {
+
+        while (start < end) {
+
+            int temp = arr[start];
+
+            arr[start] = arr[end];
+
+            arr[end] = temp;
+
+            start++;
+            end--;
+        }
+    }
+
+    // Detect natural run
+    static int detectRun(int[] arr,
+                         int lo,
+                         int hi) {
+
+        if (lo >= hi - 1)
+            return hi;
+
+        int run = lo + 1;
+
+        // Descending run
+        if (arr[run] < arr[lo]) {
+
+            while (run < hi &&
+                   arr[run] < arr[run - 1]) {
+
+                run++;
+            }
+
+            // Reverse descending run
+            reverse(arr, lo, run - 1);
+        }
+
+        // Ascending run
+        else {
+
+            while (run < hi &&
+                   arr[run] >= arr[run - 1]) {
+
+                run++;
+            }
+        }
+
+        return run;
+    }
+
+    // Insertion Sort
+    static void insertionSort(int[] arr,
+                              int left,
+                              int right) {
+
+        for (int i = left + 1;
+             i <= right;
+             i++) {
+
+            int key = arr[i];
+
+            int j = i - 1;
+
+            while (j >= left &&
+                   arr[j] > key) {
+
+                arr[j + 1] = arr[j];
+
+                j--;
+            }
+
+            arr[j + 1] = key;
+        }
+    }
+
+    // Merge Function
+    static void merge(int[] arr,
+                      int l,
+                      int m,
+                      int r) {
+
+        int len1 = m - l + 1;
+        int len2 = r - m;
+
+        int[] left = new int[len1];
+        int[] right = new int[len2];
+
+        for (int i = 0; i < len1; i++)
+            left[i] = arr[l + i];
+
+        for (int i = 0; i < len2; i++)
+            right[i] = arr[m + 1 + i];
+
+        int i = 0;
+        int j = 0;
+        int k = l;
+
+        while (i < len1 &&
+               j < len2) {
+
+            if (left[i] <= right[j]) {
+
+                arr[k] = left[i];
+                i++;
+            }
+
+            else {
+
+                arr[k] = right[j];
+                j++;
+            }
+
+            k++;
+        }
+
+        while (i < len1) {
+
+            arr[k] = left[i];
+
+            i++;
+            k++;
+        }
+
+        while (j < len2) {
+
+            arr[k] = right[j];
+
+            j++;
+            k++;
+        }
+    }
+
+    // Simplified TimSort
+    static void timSort(int[] arr,
+                        int n) {
+
+        int RUN = 4;
+
+        // Sort small runs
+        for (int i = 0;
+             i < n;
+             i += RUN) {
+
+            insertionSort(arr,
+                          i,
+                          Math.min(i + RUN - 1,
+                                   n - 1));
+        }
+
+        // Merge runs
+        for (int size = RUN;
+             size < n;
+             size = 2 * size) {
+
+            for (int left = 0;
+                 left < n;
+                 left += 2 * size) {
+
+                int mid =
+                    left + size - 1;
+
+                int right =
+                    Math.min(
+                        left + 2 * size - 1,
+                        n - 1);
+
+                if (mid < right) {
+
+                    merge(arr,
+                          left,
+                          mid,
+                          right);
+                }
+            }
+        }
+    }
+
+    // Display Array
+    static void printArray(int[] arr) {
+
+        for (int num : arr) {
+
+            System.out.print(num + " ");
+        }
+
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print(
+            "Enter number of elements: ");
+
+        int n = sc.nextInt();
+
+        int[] arr = new int[n];
+
+        System.out.println(
+            "Enter elements:");
+
+        for (int i = 0; i < n; i++) {
+
+            arr[i] = sc.nextInt();
+        }
+
+        System.out.println(
+            "\nOriginal Array:");
+
+        printArray(arr);
+
+        // Detect Runs
+        System.out.println(
+            "\nRun Detection:");
+
+        int i = 0;
+
+        while (i < n) {
+
+            int runEnd =
+                detectRun(arr,
+                          i,
+                          n);
+
+            System.out.print(
+                "Run: ");
+
+            for (int j = i;
+                 j < runEnd;
+                 j++) {
+
+                System.out.print(
+                    arr[j] + " ");
+            }
+
+            System.out.println();
+
+            i = runEnd;
+        }
+
+        // TimSort
+        timSort(arr, n);
+
+        System.out.println(
+            "\nSorted Array:");
+
+        printArray(arr);
+
+        sc.close();
+    }
+}
