@@ -1,0 +1,165 @@
+import java.util.*;
+
+class Tablet {
+
+    int startRow;
+    int endRow;
+
+    // Column Family Data
+    HashMap<String, List<String>> columnFamilies;
+
+    Tablet(int startRow, int endRow) {
+
+        this.startRow = startRow;
+        this.endRow = endRow;
+
+        columnFamilies = new HashMap<>();
+
+        columnFamilies.put("Profile",
+                new ArrayList<>());
+
+        columnFamilies.put("Orders",
+                new ArrayList<>());
+
+        columnFamilies.put("Payments",
+                new ArrayList<>());
+    }
+
+    // Add data to column family
+    void addData(String family,
+                 String value) {
+
+        columnFamilies.get(family).add(value);
+    }
+
+    // Point Lookup
+    void pointLookup(int rowKey) {
+
+        if (rowKey >= startRow &&
+            rowKey <= endRow) {
+
+            System.out.println(
+                "Row found in tablet: "
+                + startRow + " - "
+                + endRow);
+        }
+
+        else {
+
+            System.out.println(
+                "Row not found in this tablet");
+        }
+    }
+
+    // Range Scan
+    void rangeScan(int start,
+                   int end) {
+
+        System.out.println(
+            "Scanning rows from "
+            + start + " to " + end);
+    }
+
+    // Read specific column family
+    void readColumnFamily(String family) {
+
+        System.out.println(
+            "\nReading Column Family: "
+            + family);
+
+        List<String> data =
+            columnFamilies.get(family);
+
+        for (String value : data) {
+
+            System.out.println(value);
+        }
+    }
+}
+
+public class Main {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        // Create Tablets
+        Tablet t1 = new Tablet(1, 1000);
+        Tablet t2 = new Tablet(1001, 2000);
+
+        // Add Sample Data
+        t1.addData("Profile",
+                   "User Name Data");
+
+        t1.addData("Orders",
+                   "Order History");
+
+        t1.addData("Payments",
+                   "Payment Records");
+
+        // USER INPUT
+        System.out.println(
+            "1. Point Lookup");
+        System.out.println(
+            "2. Range Scan");
+        System.out.println(
+            "3. Read Column Family");
+
+        System.out.print(
+            "\nEnter choice: ");
+
+        int choice = sc.nextInt();
+
+        switch (choice) {
+
+            case 1:
+
+                System.out.print(
+                    "Enter row key: ");
+
+                int key = sc.nextInt();
+
+                t1.pointLookup(key);
+
+                break;
+
+            case 2:
+
+                System.out.print(
+                    "Enter start row: ");
+
+                int start = sc.nextInt();
+
+                System.out.print(
+                    "Enter end row: ");
+
+                int end = sc.nextInt();
+
+                t1.rangeScan(start, end);
+
+                break;
+
+            case 3:
+
+                sc.nextLine();
+
+                System.out.print(
+                    "Enter Column Family "
+                    + "(Profile/Orders/Payments): ");
+
+                String family =
+                    sc.nextLine();
+
+                t1.readColumnFamily(family);
+
+                break;
+
+            default:
+
+                System.out.println(
+                    "Invalid Choice");
+        }
+
+        sc.close();
+    }
+}
