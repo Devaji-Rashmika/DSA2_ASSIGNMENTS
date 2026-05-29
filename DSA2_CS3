@@ -1,0 +1,203 @@
+import java.util.*;
+
+public class Main {
+
+    static final int V = 6;
+
+    // BFS to find augmenting path
+    boolean bfs(int[][] residualGraph,
+                int source,
+                int sink,
+                int[] parent) {
+
+        boolean[] visited = new boolean[V];
+
+        Queue<Integer> queue =
+                new LinkedList<>();
+
+        queue.add(source);
+
+        visited[source] = true;
+
+        parent[source] = -1;
+
+        while (!queue.isEmpty()) {
+
+            int u = queue.poll();
+
+            for (int v = 0; v < V; v++) {
+
+                if (!visited[v] &&
+                    residualGraph[u][v] > 0) {
+
+                    queue.add(v);
+
+                    parent[v] = u;
+
+                    visited[v] = true;
+                }
+            }
+        }
+
+        return visited[sink];
+    }
+
+    // Edmonds-Karp Algorithm
+    int edmondsKarp(int[][] graph,
+                     int source,
+                     int sink) {
+
+        int u, v;
+
+        // Residual graph
+        int[][] residualGraph =
+                new int[V][V];
+
+        for (u = 0; u < V; u++) {
+
+            for (v = 0; v < V; v++) {
+
+                residualGraph[u][v] =
+                        graph[u][v];
+            }
+        }
+
+        int[] parent = new int[V];
+
+        int maxFlow = 0;
+
+        while (bfs(residualGraph,
+                   source,
+                   sink,
+                   parent)) {
+
+            // Find bottleneck flow
+            int pathFlow =
+                    Integer.MAX_VALUE;
+
+            for (v = sink;
+                 v != source;
+                 v = parent[v]) {
+
+                u = parent[v];
+
+                pathFlow =
+                    Math.min(pathFlow,
+                             residualGraph[u][v]);
+            }
+
+            // Update residual capacities
+            for (v = sink;
+                 v != source;
+                 v = parent[v]) {
+
+                u = parent[v];
+
+                residualGraph[u][v] -=
+                        pathFlow;
+
+                residualGraph[v][u] +=
+                        pathFlow;
+            }
+
+            // Add to max flow
+            maxFlow += pathFlow;
+
+            // Display augmenting path
+            System.out.print(
+                "Augmenting Path: ");
+
+            List<Integer> path =
+                    new ArrayList<>();
+
+            for (v = sink;
+                 v != -1;
+                 v = parent[v]) {
+
+                path.add(v);
+            }
+
+            Collections.reverse(path);
+
+            for (int node : path) {
+
+                System.out.print(
+                    getNodeName(node)
+                    + " ");
+            }
+
+            System.out.println(
+                "\nBottleneck Flow: "
+                + pathFlow);
+
+            System.out.println();
+        }
+
+        return maxFlow;
+    }
+
+    // Convert index to node name
+    static String getNodeName(int i) {
+
+        switch (i) {
+
+            case 0:
+                return "S";
+
+            case 1:
+                return "A";
+
+            case 2:
+                return "B";
+
+            case 3:
+                return "C";
+
+            case 4:
+                return "D";
+
+            case 5:
+                return "T";
+        }
+
+        return "";
+    }
+
+    public static void main(String[] args) {
+
+        Main m = new Main();
+
+        /*
+            Nodes:
+            0 = S
+            1 = A
+            2 = B
+            3 = C
+            4 = D
+            5 = T
+        */
+
+        int[][] graph = {
+
+            //S  A  B  C  D  T
+            { 0,10,10, 0, 0, 0}, // S
+            { 0, 0, 2, 4, 8, 0}, // A
+            { 0, 0, 0, 9, 0, 0}, // B
+            { 0, 0, 0, 0, 6,10}, // C
+            { 0, 0, 0, 0, 0,10}, // D
+            { 0, 0, 0, 0, 0, 0}  // T
+        };
+
+        int source = 0;
+        int sink = 5;
+
+        int maxFlow =
+            m.edmondsKarp(graph,
+                          source,
+                          sink);
+
+        System.out.println(
+            "Maximum Flow = "
+            + maxFlow);
+    }
+}
