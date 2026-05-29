@@ -1,0 +1,132 @@
+import java.util.*;
+
+class Activity {
+
+    int id;
+    int start;
+    int end;
+
+    Activity(int id,
+             int start,
+             int end) {
+
+        this.id = id;
+        this.start = start;
+        this.end = end;
+    }
+}
+
+public class Main {
+
+    // Greedy Activity Selection
+    static List<Activity> selectActivities(
+            List<Activity> activities) {
+
+        // Sort by ending time
+        activities.sort(
+            Comparator.comparingInt(a -> a.end));
+
+        List<Activity> result =
+                new ArrayList<>();
+
+        int lastEnd = -1;
+
+        for (Activity a : activities) {
+
+            // Non-overlapping activity
+            if (a.start >= lastEnd) {
+
+                result.add(a);
+
+                lastEnd = a.end;
+            }
+        }
+
+        return result;
+    }
+
+    // Display Activities
+    static void printActivities(
+            List<Activity> activities) {
+
+        for (Activity a : activities) {
+
+            System.out.println(
+                "A" + a.id
+                + " : "
+                + formatTime(a.start)
+                + " - "
+                + formatTime(a.end));
+        }
+    }
+
+    // Convert integer time to HH:MM
+    static String formatTime(int time) {
+
+        int hour = time / 100;
+
+        int minute = time % 100;
+
+        return String.format(
+                "%02d:%02d",
+                hour,
+                minute);
+    }
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        List<Activity> activities =
+                new ArrayList<>();
+
+        System.out.print(
+            "Enter number of activities: ");
+
+        int n = sc.nextInt();
+
+        // USER INPUT
+        for (int i = 0; i < n; i++) {
+
+            System.out.println(
+                "\nActivity A" + (i + 1));
+
+            System.out.print(
+                "Enter start time (HHMM): ");
+
+            int start = sc.nextInt();
+
+            System.out.print(
+                "Enter end time (HHMM): ");
+
+            int end = sc.nextInt();
+
+            activities.add(
+                new Activity(
+                    i + 1,
+                    start,
+                    end));
+        }
+
+        System.out.println(
+            "\nAll Activities:");
+
+        printActivities(activities);
+
+        // Greedy Selection
+        List<Activity> selected =
+                selectActivities(
+                    activities);
+
+        System.out.println(
+            "\nSelected Non-Overlapping Activities:");
+
+        printActivities(selected);
+
+        System.out.println(
+            "\nMaximum Activities = "
+            + selected.size());
+
+        sc.close();
+    }
+}
